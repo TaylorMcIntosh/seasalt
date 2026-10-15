@@ -43,18 +43,22 @@ object objects[] = {
 // }}}
 
 // COMMANDS && ACTIONS {{{
-void look_around(const char *noun) {
+void list_items(object *loc) {
 	object *obj;
+	for (obj = objects; obj < obj_end; obj++) {
+		if (obj->loc == loc && obj != player)
+			printf("You see: %s\n", obj->desc);
+	}
+}
+
+void look_around() {
 	printf("You are in %s.\n", player->loc->desc);
-		for (obj = objects; obj < obj_end; obj++) {
-			if (obj->loc == player->loc && obj != player)
-				printf("You see: %s\n", obj->desc);
-		}
+	list_items(player->loc);
 }
 
 void exec_look(const char *noun) {
 	if (strcmp(noun, "around") == 0)
-		look_around(noun);	
+		look_around();	
 	else
 		printf("I do not know what you wish to see.");
 }
@@ -89,17 +93,19 @@ void exec_grab(const char *noun) {
 
 // INPUT OUTPUT {{{
 static void handle_input(char *input) {
-	char *verb = strtok(input, " \n");  	// get first word  (verb)
-	char *noun = strtok(NULL, " \n");   	// get second word (noun)
-	if (verb == NULL) { return; }		// return if null
-	else if (strcmp(verb, "quit") == 0)	// quit -> quits game
+	char *verb = strtok(input, " \n");  	 // get first word  (verb)
+	char *noun = strtok(NULL, " \n");   	 // get second word (noun)
+	if (verb == NULL) { return; }		 // return if null
+	else if (strcmp(verb, "quit") == 0)	 // quit -> quits game
 		is_playing = false; 
-	else if (strcmp(verb, "look") == 0)	// look -> writes description of current map
+	else if (strcmp(verb, "look") == 0)	 // look -> writes description of current map
 		exec_look(noun);
-	else if (strcmp(verb, "move") == 0)	// move -> moves player to desired map
+	else if (strcmp(verb, "move") == 0)	 // move -> moves player to desired map
 		exec_move(noun);
-	else if (strcmp(verb, "grab") == 0)
+	else if (strcmp(verb, "grab") == 0)	 // grab -> grabs items in same location as player
 		exec_grab(noun);
+	else if (strcmp(verb, "inventory") == 0) // inventory -> opens player inventory
+		list_items(player);
 }
 // }}}
 
