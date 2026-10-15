@@ -5,17 +5,62 @@
 #include "object.h"
 
 // OBJECTS {{{
+
+adj opinions[] = {
+	{"", 0},
+};
+
+adj sizes[] = {
+	{"", 0},
+};
+
+adj qualities[] = {
+	{"", 0},
+};
+
+adj ages[] = {
+	{"", 0},
+};
+
+adj materials[] = {
+	{"", 0},
+	{"copper ", 1},
+	{"silver ", 2},
+	{"golden ", 3},
+};
+
 object objects[] = {
-	{"cave"  , NULL, NULL, &objects[1], NULL, NULL},
-	{"field" , NULL, &objects[0], NULL, NULL, &objects[2]},
-	{"beach" , NULL, NULL, NULL, &objects[1], NULL},
+	{
+ 	 "cave"  ,
+	 &opinions[0], &sizes[0], &qualities[0], &ages[0], &materials[0],
+	 NULL, NULL, &objects[1], NULL, NULL
+	},
+	{
+	 "field" ,
+	 &opinions[0], &sizes[0], &qualities[0], &ages[0], &materials[0],
+	 NULL, &objects[0], NULL, NULL, &objects[2]
+	},
+	{
+	 "beach" ,
+	 &opinions[0], &sizes[0], &qualities[0], &ages[0], &materials[0],
+	 NULL, NULL, NULL, &objects[1], NULL
+	},
 	
-	{"player", &objects[0], NULL, NULL, NULL, NULL},
-	{"coin"  , &objects[0], NULL, NULL, NULL, NULL},
+	{
+	 "player",
+	 &opinions[0], &sizes[0], &qualities[0], &ages[0], &materials[0],
+	 &objects[0], NULL, NULL, NULL, NULL
+	},
+	{
+	 "coin"  ,
+	 &opinions[0], &sizes[0], &qualities[0], &ages[0], &materials[1],
+	 &objects[0], NULL, NULL, NULL, NULL
+	},
 };
 
 void read_desc(object *obj) {
-	char desc[100] = "";
+	char desc[100] = "a ";
+	strcat(desc, obj->material->name);
 	strcat(desc, obj->name);
 	printf("%s\n", desc);
 }

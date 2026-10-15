@@ -6,14 +6,28 @@
 #include <stdbool.h>
 #include <string.h>
 
-// TODO : Add Order of Adjectives as psuedo rarity sytem for items, rolled when first grabbed
-// Opinion, Size, Physical Quality, Shape, Age, Color, Material, Type, Purpose
-
 static char input[100];
 static bool is_playing = true;
 
+typedef struct adj {
+	const char *name;
+	const int value;
+} adj;
+
+extern adj opinions[];
+extern adj sizes[];
+extern adj qualities[];
+extern adj ages[];
+extern adj materials[];
+
 typedef struct object {
 	const char *name;
+
+	struct adj *opinion;
+	struct adj *size;
+	struct adj *qualitie;
+	struct adj *age;
+	struct adj *material;
 
 	struct object *loc;
 	struct object *north;
