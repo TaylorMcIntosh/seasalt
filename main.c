@@ -30,7 +30,7 @@ object objects[] = {
 	{"beach"    , "a calm beach"  , NULL, NULL, NULL, &objects[1], NULL},
 
 	{"coin"     , "a golden coin" , &objects[0], NULL, NULL, NULL, NULL},
-	{"yourself" , "yourself"      , &objects[0], NULL, NULL, NULL, NULL},
+	{"player"   , "yourself"      , &objects[0], NULL, NULL, NULL, NULL},
 };
 
 #define cave    (objects + 0)
@@ -42,6 +42,7 @@ object objects[] = {
 #define obj_end (objects + 5)
 // }}}
 
+// COMMANDS && ACTIONS {{{
 void look_around(const char *noun) {
 	object *obj;
 	printf("You are in %s.\n", player->loc->desc);
@@ -51,18 +52,14 @@ void look_around(const char *noun) {
 		}
 }
 
-// COMMANDS && ACTIONS {{{
 void exec_look(const char *noun) {
-	if (strcmp(noun, "around") == 0) {
+	if (strcmp(noun, "around") == 0)
 		look_around(noun);	
-	}
 	else
 		printf("I do not know what you wish to see.");
 }
 
 void exec_move(const char *noun) {
-	object *obj;
-	
 	if (strcmp(noun, "north") == 0 && player->loc->north != NULL)
 		player->loc = player->loc->north;
 	else if (strcmp(noun, "south") == 0 && player->loc->south != NULL)
@@ -77,10 +74,21 @@ void exec_move(const char *noun) {
 	}
 	exec_look("around");
 }
+
+void exec_grab(const char *noun) {
+	object *obj;
+	for (obj = objects; obj < obj_end; obj++)
+		if (strcmp(noun, obj->name) == 0 && player->loc == obj->loc) {
+			printf("You picked up %s.\n", obj->desc);
+			obj->loc = player;
+			return;
+		}
+	printf("There is no %s here.\n", noun);
+}
 // }}}
 
 // INPUT OUTPUT {{{
-static void input_parse(char *input) {
+static void handle_input(char *input) {
 	char *verb = strtok(input, " \n");  	// get first word  (verb)
 	char *noun = strtok(NULL, " \n");   	// get second word (noun)
 	if (verb == NULL) { return; }		// return if null
@@ -90,18 +98,20 @@ static void input_parse(char *input) {
 		exec_look(noun);
 	else if (strcmp(verb, "move") == 0)	// move -> moves player to desired map
 		exec_move(noun);
-}
-
-static void input_handle() {
-	printf("\n--> ");
-	fgets(input, sizeof input, stdin);
-	input_parse(input);
+	else if (strcmp(verb, "grab") == 0)
+		exec_grab(noun);
 }
 // }}}
 
 // MAIN {{{
+static void game_loop() {
+	printf("\n--> ");
+	fgets(input, sizeof input, stdin);
+	handle_input(input);
+}
+
 int main(int argc, char *argv[]) {
-	while (is_playing) { input_handle(); }
+	while (is_playing) { game_loop(); }
 	return 0;
 }
 // }}}
