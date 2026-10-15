@@ -2,63 +2,40 @@
 // DATE :  2026-10-14
 // PURP :  main.c -> entry point
 
-#include <stdio.h>
-#include <stdbool.h>
-#include <string.h>
-
-static char input[100];
-static bool is_playing = true;
+#include "object.h"
 
 // OBJECTS {{{
-
-// object struct -> this will include anything interactable
-typedef struct object {
-	const char *name;
-	const char *desc;
-	struct object *loc;
-
-	struct object *north;
-	struct object *south;
-	struct object *east;
-	struct object *west;
-} object;
-
-// objects array -> Everything in the game
 object objects[] = {
-	{"cave"     , "a small cave"  , NULL, NULL, &objects[1], NULL, NULL},
-	{"field"    , "an empty field", NULL, &objects[0], NULL, NULL, &objects[2]},
-	{"beach"    , "a calm beach"  , NULL, NULL, NULL, &objects[1], NULL},
+	{"cave"  , NULL, NULL, &objects[1], NULL, NULL},
+	{"field" , NULL, &objects[0], NULL, NULL, &objects[2]},
+	{"beach" , NULL, NULL, NULL, &objects[1], NULL},
 
-	{"coin"     , "a golden coin" , &objects[0], NULL, NULL, NULL, NULL},
-	{"player"   , "yourself"      , &objects[0], NULL, NULL, NULL, NULL},
+	{"coin"  , &objects[0], NULL, NULL, NULL, NULL},
+	{"player", &objects[0], NULL, NULL, NULL, NULL},
 };
 
-#define cave    (objects + 0)
-#define field   (objects + 1)
-#define beach   (objects + 2)
-#define coin    (objects + 3)
-#define player  (objects + 4)
+void read_desc(object *obj) {
+	char desc[100] = "";
+	strcat(desc, obj->name);
+	printf("%s\n", desc);
+}
 
-#define obj_end (objects + 5)
-// }}}
-
-// COMMANDS && ACTIONS {{{
 void list_items(object *loc) {
 	object *obj;
 	for (obj = objects; obj < obj_end; obj++) {
 		if (obj->loc == loc && obj != player)
-			printf("You see: %s\n", obj->desc);
+			read_desc(obj);
 	}
 }
+// }}}
 
-void look_around() {
-	printf("You are in %s.\n", player->loc->desc);
-	list_items(player->loc);
-}
-
+// COMMANDS && ACTIONS {{{
 void exec_look(const char *noun) {
-	if (strcmp(noun, "around") == 0)
-		look_around();	
+	if (strcmp(noun, "around") == 0) {
+		printf("You are in ");
+		read_desc(player->loc);
+		list_items(player->loc);
+	}
 	else
 		printf("I do not know what you wish to see.");
 }
@@ -83,7 +60,8 @@ void exec_grab(const char *noun) {
 	object *obj;
 	for (obj = objects; obj < obj_end; obj++)
 		if (strcmp(noun, obj->name) == 0 && player->loc == obj->loc) {
-			printf("You picked up %s.\n", obj->desc);
+			printf("You picked up ");
+			read_desc(obj);
 			obj->loc = player;
 			return;
 		}
